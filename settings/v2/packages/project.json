@@ -1,0 +1,38 @@
+{
+  "__version__": "1.0.2",
+  "general": {
+    "designResolution": {
+      "width": 1280,
+      "height": 720,
+      "fitHeight": true
+    }
+  },
+  "layer": [
+    {
+      "name": "MAP",
+      "value": 524288
+    }
+  ],
+  "physics": {
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "Wall"
+      },
+      {
+        "index": 2,
+        "name": "Wepon"
+      },
+      {
+        "index": 3,
+        "name": "Body"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 1,
+      "1": 8,
+      "2": 8,
+      "3": 6
+    }
+  }
+}
