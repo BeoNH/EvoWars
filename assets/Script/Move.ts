@@ -30,13 +30,6 @@ export class Move extends Component {
         instance.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         instance.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
         instance.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
-
-        PhysicsSystem2D.instance.gravity = new Vec2(0, 0);
-        PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.Aabb |
-            EPhysics2DDrawFlags.Pair |
-            EPhysics2DDrawFlags.CenterOfMass |
-            EPhysics2DDrawFlags.Joint |
-            EPhysics2DDrawFlags.Shape;
     }
 
     onTouchStart() { }
