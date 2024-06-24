@@ -4,8 +4,6 @@ const { ccclass, property } = _decorator;
 @ccclass('Map')
 export class Map extends Component {
 
-    @property({ type: Node, tooltip: 'người chơi' })
-    private player: Node = null;
     @property({ type: Node, tooltip: 'Màn hình' })
     private camera: Node = null;
 
@@ -21,9 +19,9 @@ export class Map extends Component {
     }
 
     update(dt: number) {
-        if (this.camera) {
-            this.camera.worldPosition = this.player.worldPosition;
-        }
+        // if (this.camera) {
+        //     this.camera.worldPosition = this.player.worldPosition;
+        // }
     }
 }
 
