@@ -19,12 +19,16 @@ export class Player extends Component {
         input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
     }
 
-    start () {
+    start() {
         let collider = this.getComponentInChildren(Collider2D);
         // Listening to 'onCollisionStay' Events
         collider.on(Contact2DType.BEGIN_CONTACT, this.onCollision, this);
     }
-    
+
+    // private onCollision(event: ICollisionEvent) {
+    //     console.log(">>>>>", event.type, event);
+    // }
+
     private onCollision (self: Collider2D, other: Collider2D ,event: IPhysics2DContact | null) {
         console.log(">>>>>",self,other,event);
     }

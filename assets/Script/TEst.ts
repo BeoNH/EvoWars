@@ -1,9 +1,14 @@
-import { _decorator, Component, EPhysics2DDrawFlags, EventKeyboard, EventMouse, input, Input, KeyCode, misc, Node, PhysicsSystem2D, tween, v3, Vec2 } from 'cc';
+import { _decorator, Component, EPhysics2DDrawFlags, Node, PhysicsSystem2D, Vec2 } from 'cc';
 const { ccclass, property } = _decorator;
 
-@ccclass('Map')
-export class Map extends Component {
-    onLoad() {
+@ccclass('TEst')
+export class TEst extends Component {
+
+    @property(Node)
+    node2: Node = null;
+
+    protected onLoad(): void {
+
         PhysicsSystem2D.instance.enable = true;
         PhysicsSystem2D.instance.gravity = new Vec2(0, 0);
         PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.Aabb |
@@ -13,10 +18,14 @@ export class Map extends Component {
             EPhysics2DDrawFlags.Shape;
     }
 
-    update(dt: number) {
-        // if (this.camera) {
-        //     this.camera.position = this.player.position;
-        // }
+    start() {
+
+    }
+
+    update(deltaTime: number) {
+        let pos = this.node2.position.clone();
+        pos.x += 3;
+        this.node2.position = pos;
     }
 }
 

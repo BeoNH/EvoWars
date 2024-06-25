@@ -28,7 +28,7 @@ export class Bot extends Component {
 
         if (distance < moveStep) {
             this.node.position = targetPos;
-            this.attack();
+            // this.attack();
         } else {
             let moveDelta = Vec3.multiplyScalar(new Vec3(), dir, moveStep);
             let newPosition = Vec3.add(new Vec3(), currentPos, moveDelta);
@@ -43,7 +43,7 @@ export class Bot extends Component {
 
     update(dt: number) {
         if (!this.followNode) return;
-        this.move(dt)
+        // this.move(dt)
     }
 
 

@@ -1,4 +1,4 @@
-import { _decorator, CCInteger, Component, EPhysics2DDrawFlags, EventTouch, misc, Node, PhysicsSystem2D, v3, Vec2, Vec3 } from 'cc';
+import { _decorator, CCInteger, Component, EPhysics2DDrawFlags, EventTouch, misc, Node, PhysicsSystem2D, RigidBody2D, v3, Vec2, Vec3 } from 'cc';
 import { instance, SpeedType } from './Joystick';
 const { ccclass, property } = _decorator;
 
@@ -48,9 +48,10 @@ export class Move extends Component {
      */
     move() {
         this.node.angle = misc.radiansToDegrees(Math.atan2(this.moveDir.y, this.moveDir.x));
-        const oldPos = this.node.position.clone();
-        const newPos = oldPos.add(this.moveDir.clone().multiplyScalar(this._moveSpeed / 120));
-        this.node.position = newPos;
+        // const oldPos = this.node.position.clone();
+        // const newPos = oldPos.add(this.moveDir.clone().multiplyScalar(this._moveSpeed / 120));
+        // this.node.position = newPos;
+        this.getComponent(RigidBody2D).linearVelocity = new Vec2(this.moveDir.x * 3, this.moveDir.y * 3)
     }
 
     update(dt) {
