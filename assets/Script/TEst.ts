@@ -1,4 +1,4 @@
-import { _decorator, Component, EPhysics2DDrawFlags, Node, PhysicsSystem2D, Vec2 } from 'cc';
+import { _decorator, Collider2D, Component, Contact2DType, EPhysics2DDrawFlags, Node, PhysicsSystem2D, Vec2 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('TEst')
@@ -6,6 +6,8 @@ export class TEst extends Component {
 
     @property(Node)
     node2: Node = null;
+    @property(Collider2D)
+    c1: Collider2D = null;
 
     protected onLoad(): void {
 
@@ -16,6 +18,10 @@ export class TEst extends Component {
             EPhysics2DDrawFlags.CenterOfMass |
             EPhysics2DDrawFlags.Joint |
             EPhysics2DDrawFlags.Shape;
+
+            this.c1.on(Contact2DType.BEGIN_CONTACT, ()=>{
+                console.log("contacyt");
+            })
     }
 
     start() {
@@ -23,9 +29,9 @@ export class TEst extends Component {
     }
 
     update(deltaTime: number) {
-        let pos = this.node2.position.clone();
-        pos.x += 3;
-        this.node2.position = pos;
+        // let pos = this.node2.position.clone();
+        // pos.x += 3;
+        // this.node2.position = pos;
     }
 }
 

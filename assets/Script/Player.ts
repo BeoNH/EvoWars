@@ -20,17 +20,15 @@ export class Player extends Component {
     }
 
     start() {
-        let collider = this.getComponentInChildren(Collider2D);
+        let collider = this.getComponent(Collider2D);
         // Listening to 'onCollisionStay' Events
         collider.on(Contact2DType.BEGIN_CONTACT, this.onCollision, this);
     }
 
-    // private onCollision(event: ICollisionEvent) {
-    //     console.log(">>>>>", event.type, event);
-    // }
-
     private onCollision (self: Collider2D, other: Collider2D ,event: IPhysics2DContact | null) {
-        console.log(">>>>>",self,other,event);
+        if(self.node !== other.node.parent.parent && other.node.parent.name == 'Wepon'){
+            console.log(">>>>>Player");
+        }
     }
 
     onKeyDown(event: EventKeyboard) {

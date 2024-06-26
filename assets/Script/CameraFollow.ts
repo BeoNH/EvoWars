@@ -12,16 +12,16 @@ export class CameraFollow extends Component {
     // start() {}
 
     update(deltaTime: number) {
-        // const { target, node, ratio } = this;
+        const { target, node, ratio } = this;
 
-        // if (target) {
-        //     node.position = Vec3.lerp(
-        //         node.position,
-        //         node.position,
-        //         target.position,
-        //         ratio
-        //     );
-        // }
+        if (target) {
+            node.position = Vec3.lerp(
+                new Vec3(),
+                node.position,
+                target.position,
+                ratio
+            );
+        }
     }
 }
 
