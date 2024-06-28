@@ -55,21 +55,23 @@ export class Move extends Component {
     }
 
     update(dt) {
-        switch (this._speedType) {
-            case SpeedType.STOP:
-                this._moveSpeed = this.stopSpeed;
-                break;
-            case SpeedType.NORMAL:
-                this._moveSpeed = this.normalSpeed;
-                break;
-            case SpeedType.FAST:
-                this._moveSpeed = this.fastSpeed;
-                break;
-            default:
-                break;
-        }
-        if (this._speedType !== SpeedType.STOP) {
-            this.move();
+        if (this.node) {
+            switch (this._speedType) {
+                case SpeedType.STOP:
+                    this._moveSpeed = this.stopSpeed;
+                    break;
+                case SpeedType.NORMAL:
+                    this._moveSpeed = this.normalSpeed;
+                    break;
+                case SpeedType.FAST:
+                    this._moveSpeed = this.fastSpeed;
+                    break;
+                default:
+                    break;
+            }
+            if (this._speedType !== SpeedType.STOP) {
+                this.move();
+            }
         }
     }
 }

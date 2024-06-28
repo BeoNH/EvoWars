@@ -1,8 +1,12 @@
-import { _decorator, Animation, Button, CircleCollider2D, Collider, Collider2D, Component, Contact2DType, EventKeyboard, EventTouch, ICollisionEvent, Input, input, IPhysics2DContact, KeyCode, Sprite, tween, UIOpacity } from 'cc';
+import { _decorator, Animation, AssetManager, assetManager, BoxCollider2D, Button, CCInteger, CircleCollider2D, Collider, Collider2D, Component, Contact2DType, director, EventKeyboard, EventTouch, ICollisionEvent, Input, input, instantiate, IPhysics2DContact, KeyCode, Node, Prefab, resources, Sprite, sys, tween, UIOpacity, warn } from 'cc';
+import { EventMgr } from './EventMgr';
 const { ccclass, property } = _decorator;
 
 @ccclass('Player')
 export class Player extends Component {
+
+    @property({ type: CCInteger, tooltip: "loại nhân vật" })
+    public typeChar = 1;
 
     private coolDown: number = 1; //thoi gian hoi chieu
     private canAttack: boolean = true;
@@ -20,15 +24,38 @@ export class Player extends Component {
     }
 
     start() {
-        let collider = this.getComponent(Collider2D);
-        // Listening to 'onCollisionStay' Events
-        collider.on(Contact2DType.BEGIN_CONTACT, this.onCollision, this);
+        this.loadCharater(() => {
+            sys.localStorage.setItem('player1', `${this.typeChar}`);
+            let collider = this.node.getChildByName(`Charater${this.typeChar}`).getComponent(Collider2D);
+            if (collider) {
+                // Listening to 'onCollisionStay' Events
+                collider.on(Contact2DType.BEGIN_CONTACT, this.onCollision, this);
+            }
+        });
     }
 
-    private onCollision (self: Collider2D, other: Collider2D ,event: IPhysics2DContact | null) {
-        if(self.node !== other.node.parent.parent && other.node.parent.name == 'Wepon'){
-            console.log(">>>>>Player");
+    private onCollision(self: Collider2D, other: Collider2D, event: IPhysics2DContact | null) {
+        if (self.node.parent !== other.node.parent.parent.parent && other.node.parent.name == 'Wepon') {
+            let body = this.node.getChildByPath(`Charater${this.typeChar}/Body`)
+            body.active = false;
+
+            let dead = this.node.getChildByName('DestroyAnim')
+            dead.active = true;
+            dead.getComponent(Animation).play();
+            dead.getComponent(Animation).once(Animation.EventType.FINISHED, () => {
+                this.node.destroy();
+                EventMgr.emit(EventMgr.eventType.GAME_OVER, sys.localStorage.getItem('player1'), sys.localStorage.getItem('player2'))
+            }, this);
         }
+    }
+
+    private loadCharater(cb: Function) {
+        resources.load<Prefab>(`prefabs/Charater/Charater${this.typeChar}`, (err, pref) => {
+            // Instantiate and add to parent
+            const uiView: Node = instantiate(pref);
+            this.node.addChild(uiView);
+            cb();
+        });
     }
 
     onKeyDown(event: EventKeyboard) {
@@ -58,11 +85,15 @@ export class Player extends Component {
             button.enabled = false;
         }
 
-        const wepon = this.node.getChildByPath('Wepon');
+        const wepon = this.node.getChildByPath(`Charater${this.typeChar}/Wepon`);
         if (wepon) {
+            wepon.getChildByName("Image").getComponent(BoxCollider2D).enabled = true;
             const animation = wepon.getComponent(Animation);
             if (animation) {
                 animation.play();
+                animation.once(Animation.EventType.FINISHED, () => {
+                    wepon.getChildByName("Image").getComponent(BoxCollider2D).enabled = false;
+                }, this);
             }
 
             this.scheduleOnce(() => {

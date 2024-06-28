@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Vec3 } from 'cc';
+import { _decorator, Camera, Component, Node, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('CameraFollow')
@@ -9,7 +9,9 @@ export class CameraFollow extends Component {
     @property
     public ratio: number = 0.08;
 
-    // start() {}
+    start() {
+        this.node.getComponent(Camera).camera
+    }
 
     update(deltaTime: number) {
         const { target, node, ratio } = this;
