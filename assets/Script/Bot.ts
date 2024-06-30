@@ -24,11 +24,6 @@ export class Bot extends Component {
     private targetPos: Vec3 = Vec3.ZERO;
 
     protected onLoad(): void {
-        this._BOT = BOT_Type.MOVE;
-        this.targetPos = this.tagetNode.position.clone();
-    }
-
-    start() {
         this.loadCharater(()=>{
             sys.localStorage.setItem('player2', `${this.typeChar}`);
             let collider = this.node.getChildByName(`Charater${this.typeChar}`).getComponent(Collider2D);
@@ -36,6 +31,13 @@ export class Bot extends Component {
                 collider.on(Contact2DType.BEGIN_CONTACT, this.onCollision, this);
             }
         });
+    }
+
+    start() {
+        this.scheduleOnce(()=>{
+            this._BOT = BOT_Type.MOVE;
+            this.targetPos = this.tagetNode.position.clone();
+        },0.3)
     }
 
     private onCollision(self: Collider2D, other: Collider2D, event: IPhysics2DContact | null) {
@@ -48,7 +50,8 @@ export class Bot extends Component {
             dead.getComponent(Animation).play();
             dead.getComponent(Animation).once(Animation.EventType.FINISHED, () => {
                 this.node.destroy();
-                EventMgr.emit(EventMgr.eventType.GAME_OVER,sys.localStorage.getItem('player1'),sys.localStorage.getItem('player2'))
+                EventMgr.emit(EventMgr.eventType.GAME_OVER)
+                sys.localStorage.setItem(`winner`,`player`);
             }, this);
         }
     }
@@ -117,6 +120,7 @@ export class Bot extends Component {
 
     attack() {
         if (!this.canAttack) return;
+        if(!this.node) return; 
         this.canAttack = false;
 
         const wepon = this.node.getChildByPath(`Charater${this.typeChar}/Wepon`);
@@ -157,8 +161,8 @@ export class Bot extends Component {
     }
 
     rangeAttack() {
-        
-        const rangeBody = this.node.getChildByName(`Charater${this.typeChar}`).getComponent(CircleCollider2D).radius;
+
+        const rangeBody = this.node.getChildByPath(`Charater${this.typeChar}`).getComponent(CircleCollider2D).radius;
         const rangeWepon = this.node.getChildByPath(`Charater${this.typeChar}/Wepon/Image`).getComponent(BoxCollider2D).size.width;
         const rangeHit = rangeBody + rangeWepon;
 

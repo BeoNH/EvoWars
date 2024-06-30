@@ -4,8 +4,11 @@ const { ccclass, property } = _decorator;
 @ccclass('Map')
 export class Map extends Component {
 
-
     onLoad() {
+        // this.debugPhysics();
+    }
+    
+    debugPhysics(){
         PhysicsSystem2D.instance.enable = true;
         PhysicsSystem2D.instance.gravity = new Vec2(0, 0);
         PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.Aabb |
@@ -13,6 +16,7 @@ export class Map extends Component {
             EPhysics2DDrawFlags.CenterOfMass |
             EPhysics2DDrawFlags.Joint |
             EPhysics2DDrawFlags.Shape;
+
     }
 }
 

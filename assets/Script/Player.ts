@@ -13,8 +13,14 @@ export class Player extends Component {
 
 
     onLoad() {
-        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
+        this.loadCharater(() => {
+            sys.localStorage.setItem('player1', `${this.typeChar}`);
+            let collider = this.node.getChildByName(`Charater${this.typeChar}`).getComponent(Collider2D);
+            if (collider) {
+                // Listening to 'onCollisionStay' Events
+                collider.on(Contact2DType.BEGIN_CONTACT, this.onCollision, this);
+            }
+        });
     }
 
 
@@ -24,14 +30,8 @@ export class Player extends Component {
     }
 
     start() {
-        this.loadCharater(() => {
-            sys.localStorage.setItem('player1', `${this.typeChar}`);
-            let collider = this.node.getChildByName(`Charater${this.typeChar}`).getComponent(Collider2D);
-            if (collider) {
-                // Listening to 'onCollisionStay' Events
-                collider.on(Contact2DType.BEGIN_CONTACT, this.onCollision, this);
-            }
-        });
+        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
     }
 
     private onCollision(self: Collider2D, other: Collider2D, event: IPhysics2DContact | null) {
@@ -43,8 +43,9 @@ export class Player extends Component {
             dead.active = true;
             dead.getComponent(Animation).play();
             dead.getComponent(Animation).once(Animation.EventType.FINISHED, () => {
-                this.node.destroy();
-                EventMgr.emit(EventMgr.eventType.GAME_OVER, sys.localStorage.getItem('player1'), sys.localStorage.getItem('player2'))
+                this.node.active = false;
+                EventMgr.emit(EventMgr.eventType.GAME_OVER)
+                sys.localStorage.setItem(`winner`,`bot`);
             }, this);
         }
     }
