@@ -67,29 +67,6 @@ export class Joystick extends Component {
       }
     
       /**
-       * 启用时
-       */
-      onEnable() {
-        instance.on("set_joystick_type", this._onSetJoystickType, this);
-      }
-    
-      /**
-       * 禁用时
-       */
-      onDisable() {
-        instance.off("set_joystick_type", this._onSetJoystickType, this);
-      }
-    
-      /**
-       * 改变摇杆类型
-       * @param type
-       */
-      _onSetJoystickType(type: JoystickType) {
-        this.joystickType = type;
-        this.node.getComponent(UIOpacity).opacity = type === JoystickType.FIXED ? 255 : 0;
-      }
-    
-      /**
        * 初始化触摸事件
        */
       _initTouchEvent() {

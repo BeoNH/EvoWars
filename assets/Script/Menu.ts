@@ -1,18 +1,17 @@
 import { _decorator, Component, director, Node } from 'cc';
+import { Storage } from './Storage';
 const { ccclass, property } = _decorator;
 
 @ccclass('Menu')
 export class Menu extends Component {
-    start() {
+  start() {
+    Storage.start();
+  }
 
-    }
-
-    update(deltaTime: number) {
-        
-    }
-    onPlay(e) {
-        director.loadScene(`gamePlay`);
-      }
+  onPlay(e) {
+    Storage.setData(`score`, [0, 0]);
+    director.loadScene(`gamePlay`);
+  }
 }
 
 

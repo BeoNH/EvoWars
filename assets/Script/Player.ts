@@ -1,5 +1,6 @@
 import { _decorator, Animation, AssetManager, assetManager, BoxCollider2D, Button, CCInteger, CircleCollider2D, Collider, Collider2D, Component, Contact2DType, director, EventKeyboard, EventTouch, ICollisionEvent, Input, input, instantiate, IPhysics2DContact, KeyCode, Node, Prefab, resources, Sprite, sys, tween, UIOpacity, warn } from 'cc';
 import { EventMgr } from './EventMgr';
+import { Storage } from './Storage';
 const { ccclass, property } = _decorator;
 
 @ccclass('Player')
@@ -11,14 +12,20 @@ export class Player extends Component {
     private coolDown: number = 1; //thoi gian hoi chieu
     private canAttack: boolean = true;
 
+    private lastCollisionTime: number = 0;
+    private collisionCooldown: number = 2;
 
     onLoad() {
         this.loadCharater(() => {
             sys.localStorage.setItem('player1', `${this.typeChar}`);
-            let collider = this.node.getChildByName(`Charater${this.typeChar}`).getComponent(Collider2D);
+            let collider = this.node.getChildByName(`Charater${this.typeChar}`).getComponent(CircleCollider2D);
             if (collider) {
                 // Listening to 'onCollisionStay' Events
-                collider.on(Contact2DType.BEGIN_CONTACT, this.onCollision, this);
+                let bodyCollider = this.getComponent(CircleCollider2D);
+                bodyCollider.radius = collider.radius;
+                bodyCollider.offset = collider.offset.clone();
+                bodyCollider.apply();
+                bodyCollider.on(Contact2DType.BEGIN_CONTACT, this.onCollision, this);
             }
         });
     }
@@ -35,21 +42,39 @@ export class Player extends Component {
     }
 
     private onCollision(self: Collider2D, other: Collider2D, event: IPhysics2DContact | null) {
-        if (self.node.parent !== other.node.parent.parent.parent && other.node.parent.name == 'Wepon') {
-            let body = this.node.getChildByPath(`Charater${this.typeChar}/Body`)
-            body.active = false;
-
-            let dead = this.node.getChildByName('DestroyAnim')
-            dead.active = true;
-            dead.getComponent(Animation).play();
-            dead.getComponent(Animation).once(Animation.EventType.FINISHED, () => {
-                this.node.active = false;
-                EventMgr.emit(EventMgr.eventType.GAME_OVER)
-                sys.localStorage.setItem(`winner`,`bot`);
-            }, this);
+        const currentTime = Date.now() / 1000;
+        if (self.node !== other.node.parent.parent.parent && other.node.parent.name == 'Wepon') {
+            if (currentTime - this.lastCollisionTime >= this.collisionCooldown) {             
+                this.handleCollision();
+                this.lastCollisionTime = currentTime;
+            }
         }
     }
 
+    private handleCollision() {
+        const body = this.node.getChildByPath(`Charater${this.typeChar}/Body`)
+        if (body) {
+            body.active = false;
+        }
+        
+        const dead = this.node.getChildByName('DestroyAnim');
+        if (dead) {
+            dead.active = true;
+            const animation = dead.getComponent(Animation);
+            if (animation) {
+                animation.play();
+                animation.once(Animation.EventType.FINISHED, () => {
+                    this.node.destroy();
+                    director.pause();
+                    let score = Storage.getData('score');
+                    score[1] += 1;
+                    Storage.setData(`score`, score);
+                    Storage.setData(`winner`, `bot`);
+                    EventMgr.emit(EventMgr.eventType.GAME_OVER);
+                }, this);
+            }
+        }
+    }
     private loadCharater(cb: Function) {
         resources.load<Prefab>(`prefabs/Charater/Charater${this.typeChar}`, (err, pref) => {
             // Instantiate and add to parent

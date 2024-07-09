@@ -1,13 +1,10 @@
 import { _decorator, Component,  EPhysics2DDrawFlags, PhysicsSystem2D, Vec2 } from 'cc';
+import { Storage } from './Storage';
 const { ccclass, property } = _decorator;
 
 @ccclass('Map')
 export class Map extends Component {
 
-    onLoad() {
-        // this.debugPhysics();
-    }
-    
     debugPhysics(){
         PhysicsSystem2D.instance.enable = true;
         PhysicsSystem2D.instance.gravity = new Vec2(0, 0);
@@ -18,5 +15,10 @@ export class Map extends Component {
             EPhysics2DDrawFlags.Shape;
 
     }
+    
+    onLoad() {
+        // this.debugPhysics();
+    }
+    
 }
 

@@ -6,23 +6,15 @@ export class CameraFollow extends Component {
     @property(Node)
     public target: Node = null;
 
-    @property
-    public ratio: number = 0.08;
-
     start() {
-        this.node.getComponent(Camera).camera
+        // this.node.getComponent(Camera).camera
     }
 
     update(deltaTime: number) {
-        const { target, node, ratio } = this;
+        const { target, node } = this;
 
-        if (target) {
-            node.position = Vec3.lerp(
-                new Vec3(),
-                node.position,
-                target.position,
-                ratio
-            );
+        if (target && target.parent) {
+            node.position = target.position.clone();
         }
     }
 }

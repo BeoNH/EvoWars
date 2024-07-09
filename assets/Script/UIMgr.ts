@@ -10,6 +10,7 @@ import {
 } from "cc";
 import { EventMgr } from "./EventMgr";
 import { gameOver } from "./gameOver";
+import { Storage } from "./Storage";
 const { ccclass, property } = _decorator;
 
 @ccclass("UIMgr")
@@ -18,37 +19,44 @@ export class UIMgr extends Component {
   showGameOver: Prefab = null;
   @property({ type: Label, tooltip: "" })
   timeLabel: Label = null;
+  @property({ type: Label, tooltip: "" })
+  scoreLabel: Label[] = [];
 
   private startTime: number = 0;
 
   onLoad() {
-    console.log(">>>>>>>>>>>")
+    console.log(">>>>>")
     EventMgr.once(EventMgr.eventType.GAME_OVER, this.gameOver, this);
 
     this.startTime = Date.now();
   }
 
   protected onDisable(): void {
-    console.log("<<<<<<<<<<<")
-    EventMgr.on(EventMgr.eventType.GAME_OVER, this.gameOver, this);
-      
+    EventMgr.off(EventMgr.eventType.GAME_OVER, this.gameOver, this);
+
   }
 
   update(dt: number) {
     // Cập nhật Label
     this.timeLabel.string = this.getElapsedTime();
+    let score = Storage.getData('score');
+    this.scoreLabel[0].string = `${score[0]}`;
+    this.scoreLabel[1].string = `${score[1]}`;
   }
 
   private gameOver() {
-    resources.load<Prefab>(`prefabs/GameOver`, (err, pref) => {
+    let score = Storage.getData('score');
+    if (score[0] >= 3 || score[1] >= 3) {
+      resources.load<Prefab>(`prefabs/GameOver`, (err, pref) => {
         const uiView: Node = instantiate(pref);
-      uiView.getComponent(gameOver).init();
-      this.node.addChild(uiView);
+        uiView.getComponent(gameOver).init(score);
+        // console.log(">>>>>>>>tétadfa",this.node,uiView)
+        this.node.addChild(uiView);
       });
-
-    //   const uiView: Node = instantiate(this.showGameOver);
-    //   uiView.getComponent(gameOver).init();
-    //   this.node.addChild(uiView);
+    } else {
+      director.loadScene(`gamePlay`);
+      director.resume();
+    }
   }
 
   getElapsedTime(): string {
@@ -61,5 +69,9 @@ export class UIMgr extends Component {
     const formattedSecond = seconds < 10 ? "0" + seconds : String(seconds);
 
     return `${formattedMinute}:${formattedSecond}`;
+  }
+
+  test() {
+    director.loadScene(`gamePlay`);
   }
 }

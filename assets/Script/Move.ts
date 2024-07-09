@@ -1,4 +1,4 @@
-import { _decorator, CCInteger, Component, EPhysics2DDrawFlags, EventTouch, misc, Node, PhysicsSystem2D, RigidBody2D, v3, Vec2, Vec3 } from 'cc';
+import { _decorator, CCInteger, Component, director, Director, EPhysics2DDrawFlags, EventTouch, misc, Node, PhysicsSystem2D, RigidBody, RigidBody2D, v3, Vec2, Vec3 } from 'cc';
 import { instance, SpeedType } from './Joystick';
 const { ccclass, property } = _decorator;
 
@@ -25,7 +25,6 @@ export class Move extends Component {
     @property({ type: CCInteger, tooltip: "Normal Speed" })
     fastSpeed = 400;
 
-
     onLoad() {
         instance.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         instance.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
@@ -50,8 +49,13 @@ export class Move extends Component {
         this.node.angle = misc.radiansToDegrees(Math.atan2(this.moveDir.y, this.moveDir.x));
         const oldPos = this.node.position.clone();
         const newPos = oldPos.add(this.moveDir.clone().multiplyScalar(this._moveSpeed / 120));
+
+        if (newPos.y > 950) newPos.y = 950;
+        else if (newPos.y < -950) newPos.y = -950;
+        if (newPos.x > 1469.855) newPos.x = 1469.855;
+        else if (newPos.x < -1469.855) newPos.x = -1469.855;
+
         this.node.position = newPos;
-        // this.getComponent(RigidBody2D).linearVelocity = new Vec2(this.moveDir.x * 3, this.moveDir.y * 3)
     }
 
     update(dt) {
