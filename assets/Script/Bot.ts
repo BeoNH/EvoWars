@@ -1,6 +1,7 @@
 import { _decorator, Animation, BoxCollider2D, CCInteger, CircleCollider2D, clamp, Collider2D, Component, Contact2DType, director, instantiate, IPhysics2DContact, misc, Node, Prefab, resources, Sprite, sys, tween, UIOpacity, Vec3 } from 'cc';
 import { EventMgr } from './EventMgr';
 import { Storage } from './Storage';
+import { Player } from './Player';
 const { ccclass, property } = _decorator;
 
 export enum BOT_Type {
@@ -28,6 +29,8 @@ export class Bot extends Component {
     private lastCollisionTime: number = 0;
     private collisionCooldown: number = 2;
 
+    public isDeath = false;
+
     protected onLoad(): void {
         this.loadCharater(() => {
             sys.localStorage.setItem('player2', `${this.typeChar}`);
@@ -44,23 +47,26 @@ export class Bot extends Component {
     }
 
     private onCollision(self: Collider2D, other: Collider2D, event: IPhysics2DContact | null) {
+        if (this.isDeath) return;
         const currentTime = Date.now() / 1000; // Lấy thời gian hiện tại (giây)
         if (self.node !== other.node.parent.parent.parent && other.node.parent.name == 'Wepon') {
             if (currentTime - this.lastCollisionTime >= this.collisionCooldown) {
-                this.handleCollision();
+                this.handleCollision(other.node.parent.parent.parent);
                 this.lastCollisionTime = currentTime;
             }
         }
     }
 
-    private handleCollision() {
+    private handleCollision(other: Node) {
+        
         const body = this.node.getChildByPath(`Charater${this.typeChar}/Body`)
         if (body) {
             body.active = false;
+            this.isDeath = true;
         }
 
         const dead = this.node.getChildByName('DestroyAnim');
-        if (dead) {
+        if (dead && !other.getComponent(Player).isDeath) {
             dead.active = true;
             const animation = dead.getComponent(Animation);
             if (animation) {
@@ -171,7 +177,7 @@ export class Bot extends Component {
         const rangeWepon = this.node.getChildByPath(`Charater${this.typeChar}/Wepon/Image`)?.getComponent(BoxCollider2D).size.width;
         const rangeHit = rangeBody + rangeWepon;
 
-        return rangeHit - rangeHit * 0.2;
+        return rangeHit - rangeHit * 0.3;
     }
 
     randomPos(min: number, max: number): number {

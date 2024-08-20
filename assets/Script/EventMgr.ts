@@ -2,6 +2,7 @@
 export class EventMgr {
     public static eventType: any = {
         GAME_OVER: 'gameOver',
+        MOUSE:'Mouse',
     }
 
     private static _handlers: { [key: string]: any[] } = {};

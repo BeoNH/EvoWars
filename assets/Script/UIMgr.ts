@@ -7,6 +7,7 @@ import {
   Node,
   Prefab,
   resources,
+  sys,
 } from "cc";
 import { EventMgr } from "./EventMgr";
 import { gameOver } from "./gameOver";
@@ -34,6 +35,13 @@ export class UIMgr extends Component {
   protected onDisable(): void {
     EventMgr.off(EventMgr.eventType.GAME_OVER, this.gameOver, this);
 
+  }
+
+  protected start(): void {
+    if (!sys.isMobile) {
+      this.node.getChildByPath(`Joystick`).active = false;
+      this.node.getChildByPath(`Attack_btn`).active = false;
+    }
   }
 
   update(dt: number) {

@@ -11,6 +11,7 @@ export class Menu extends Component {
   onPlay(e) {
     Storage.setData(`score`, [0, 0]);
     director.loadScene(`gamePlay`);
+    director.resume();
   }
 }
 

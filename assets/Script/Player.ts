@@ -1,10 +1,16 @@
 import { _decorator, Animation, AssetManager, assetManager, BoxCollider2D, Button, CCInteger, CircleCollider2D, Collider, Collider2D, Component, Contact2DType, director, EventKeyboard, EventTouch, ICollisionEvent, Input, input, instantiate, IPhysics2DContact, KeyCode, Node, Prefab, resources, Sprite, sys, tween, UIOpacity, warn } from 'cc';
 import { EventMgr } from './EventMgr';
 import { Storage } from './Storage';
+import { Bot } from './Bot';
 const { ccclass, property } = _decorator;
 
 @ccclass('Player')
 export class Player extends Component {
+    private static _instance: Player;
+
+    public static get Instance(): Player {
+        return this._instance;
+    }
 
     @property({ type: CCInteger, tooltip: "loại nhân vật" })
     public typeChar = 1;
@@ -14,8 +20,12 @@ export class Player extends Component {
 
     private lastCollisionTime: number = 0;
     private collisionCooldown: number = 2;
+    
+    public isDeath = false;
 
     onLoad() {
+        Player._instance = this;
+
         this.loadCharater(() => {
             sys.localStorage.setItem('player1', `${this.typeChar}`);
             let collider = this.node.getChildByName(`Charater${this.typeChar}`).getComponent(CircleCollider2D);
@@ -30,35 +40,34 @@ export class Player extends Component {
         });
     }
 
-
-    onDestroy() {
-        input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-        input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
-    }
-
     start() {
-        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
+
     }
 
     private onCollision(self: Collider2D, other: Collider2D, event: IPhysics2DContact | null) {
+        if(this.isDeath) return;
+
         const currentTime = Date.now() / 1000;
+
         if (self.node !== other.node.parent.parent.parent && other.node.parent.name == 'Wepon') {
-            if (currentTime - this.lastCollisionTime >= this.collisionCooldown) {             
-                this.handleCollision();
+            if (currentTime - this.lastCollisionTime >= this.collisionCooldown) {
+                this.handleCollision(other.node.parent.parent.parent);
                 this.lastCollisionTime = currentTime;
             }
         }
     }
 
-    private handleCollision() {
+    private handleCollision(other: Node) {
+        console.log(other);
         const body = this.node.getChildByPath(`Charater${this.typeChar}/Body`)
         if (body) {
             body.active = false;
+            this.isDeath = true;
+            console.log(">>>>>>>>>>>")
         }
-        
+
         const dead = this.node.getChildByName('DestroyAnim');
-        if (dead) {
+        if (dead && !other.getComponent(Bot).isDeath) {
             dead.active = true;
             const animation = dead.getComponent(Animation);
             if (animation) {
@@ -84,29 +93,15 @@ export class Player extends Component {
         });
     }
 
-    onKeyDown(event: EventKeyboard) {
-        switch (event.keyCode) {
-            case KeyCode.KEY_A:
-                console.log('Press a key');
-                break;
-        }
-    }
-
-    onKeyUp(event: EventKeyboard) {
-        switch (event.keyCode) {
-            case KeyCode.KEY_A:
-                this.attack(null);
-                break;
-        }
-    }
-
-
     attack(e: EventTouch) {
         if (!this.canAttack) return;
 
         this.canAttack = false;
 
-        let button = e.target.getComponent(Button);
+        let button = null;
+        if(sys.isMobile){
+            button = e.target.getComponent(Button);
+        }
         if (button) {
             button.enabled = false;
         }
